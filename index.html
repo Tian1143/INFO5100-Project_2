@@ -13,11 +13,11 @@
         }
         
         .country.medal {
-            fill: yellow;
+            fill: rgb(254, 254, 193);
         }
         
         .country:hover {
-            fill: orange;
+            fill: rgb(255, 178, 34);
         }
         
         .tooltip {
@@ -107,13 +107,14 @@
 </head>
 <body>
     <p class="title">Olympic Participation and Medal Wins by Country on 2023</p>
-    <svg id="worldMap" height="700" width="1000"></svg>
+    <svg id="worldMap" height="700" width="1100" style="background-color: rgb(218, 235, 250); margin-left: 50px;"></svg>
     <button class="reset-button" onclick="resetZoom()">Reset</button>
-    <br>
+    
+    <div style="margin-left: 50px;">
     <svg id="medalChart" height="300" width="300" ></svg><!--style="margin-left: 60px; margin-top: 10px;"-->
     <svg id="gdpChart" height="300" width="300"></svg><!--style="margin-left: 60px; margin-top: 10px;"-->
     <svg id="populationChart" height="300" width="300" ></svg><!--style="margin-left: 60px; margin-top: 10px;"-->
-
+    </div>
     <p class="title">GDP and Medals comparision between different countries.</p>
     <svg id="lineGraph" height="700" width="1000"></svg>
     <div id="button-bar"></div>
