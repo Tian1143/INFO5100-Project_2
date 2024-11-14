@@ -354,11 +354,10 @@
                                 .selectAll("text")
                                 .style("text-anchor", "middle")
                                 .style("font-size", "12");
+            }
 
             chartArea.selectAll("path").remove();
             chartArea.selectAll("circle").remove();
-        }
-
         
             chartArea.append("path")
                     .datum(filteredData)
