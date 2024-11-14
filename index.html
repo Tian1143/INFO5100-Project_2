@@ -21,7 +21,7 @@
                         .attr("transform","translate("+marginMap.left+","+marginMap.top+")");
         // World Map code
         const mapData = async function() {
-        const world = await d3.json("");
+        const world = await d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json");
 
 
         const olympicsData = await d3.csv("olympics.csv", d3.autoType);
