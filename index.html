@@ -5,9 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project 2</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
+    <style>
+    .country {
+      fill: lightgrey;
+    }
+    </style>
 </head>
 <body>
-    <svg id="worldMap" height="1000" width="1000"></svg>
+    <svg id="worldMap" height="800" width="1000"></svg>
     <svg id="lineGraph" height="1000" width="1000"></svg>
     <script>
         // World Map
@@ -22,10 +28,42 @@
         // World Map code
         const mapData = async function() {
         const world = await d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json");
+        console.log("worldJson",world);
 
+            var countries = topojson.feature(world,world.objects.countries);
+            console.log("Countries:", countries);
+            var countriesMesh = topojson.mesh(world,world.objects.countries); 
+            console.log("CountriesMesh:", countriesMesh);
+            var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], countries);
+            var path = d3.geoPath().projection(projection);
+
+            let graticule = d3.geoGraticule10();
+                console.log(graticule);
+                map.append("path").attr("class","graticule").attr("d", path(graticule));
+
+            let countryPaths = map.selectAll("path.country").data(countries.features)
+                       .join("path")
+                       .attr("class", "country")
+                       .attr("note", d => d.id)  
+                       .attr("d", path);
+                       //.on('mouseover',  mouseEntersState )
+                       //.on('mouseout',  mouseLeavesState );
+    
+            map.append("path").datum(countriesMesh)
+                .attr("fill", "none")
+                .attr("d", path)
+                .attr("stroke", "black")
+                .attr("stroke-width", 1);
 
         const olympicsData = await d3.csv("olympics.csv", d3.autoType);
-        console.log(olympicsData);
+        console.log("olympicsData",olympicsData);
+            var countryDict = {}
+            olympicsData.forEach( d => {
+                countryDict[d.country] = d;
+            });
+            console.log(countryDict);
+
+
         }
         mapData();
         // Line Graph
