@@ -10,7 +10,28 @@
     <svg id="worldMap" height="1000" width="1000"></svg>
     <svg id="lineGraph" height="1000" width="1000"></svg>
     <script>
+        // World Map
+        const svgMap = d3.select("#worldMap");
+        const widthMap = svg.attr("width");
+        const heightMap = svg.attr("height");
+        const marginMap = { top: 20, right: 20, bottom: 20, left:20};
+        const mapWidth = widthMap - marginMap.left - marginMap.right;
+        const mapHeight = heightMap - marginMap.top - marginMap.bottom;
+        const map = svg.append("g")
+                        .attr("transform","translate("+margin.left+","+margin.top+")");
+        // World Map code
 
+        // Line Graph
+        const svgGraph = d3.select("#lineGraph");
+        const widthGraph = +svgGraph.attr("width");
+        const heightGraph = +svgGraph.attr("height");
+        const marginGraph = { top: 20, right: 20, bottom: 20, left: 20 };
+        const graphWidth = widthGraph - marginGraph.left - marginGraph.right;
+        const graphHeight = heightGraph - marginGraph.top - marginGraph.bottom;
+        const graph = svgGraph.append("g")
+                            .attr("transform", "translate(" + marginGraph.left + "," + marginGraph.top + ")");
+        // Line Graph code
+        
     </script>
 </body>
 </html>
