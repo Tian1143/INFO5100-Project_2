@@ -326,7 +326,7 @@
         let bottomAxis = d3.axisBottom(countryScale);
         let bottomAxisG = annotations.append("g")
                                         .attr("class", "x axis")
-                                        .attr("transform",`translate(${marginL.left},${graphLHeight+marginL.top+10})`);
+                                        .attr("transform",`translate(${marginL.left},${graphLHeight+marginL.top})`);
 
         var gclineGen = d3.line()
                         .x( d => countryScale(d['country']) )
@@ -342,13 +342,22 @@
             const filteredData = olympicsData.filter(d => d.region === region);
 
             countryScale.domain(filteredData.map(d => d.country));
-            bottomAxisG.call(d3.axisBottom(countryScale))
+            if (region === "Asia" || region === "Europe") {
+                bottomAxisG.call(d3.axisBottom(countryScale))
                                 .selectAll("text")
                                 .style("text-anchor", "end")
-                                .attr("transform", "rotate(-45)");
+                                .style("font-size", "12")
+                                .attr("transform", "rotate(-30)");
+            }
+            else {
+            bottomAxisG.call(d3.axisBottom(countryScale))
+                                .selectAll("text")
+                                .style("text-anchor", "middle")
+                                .style("font-size", "12");
 
             chartArea.selectAll("path").remove();
             chartArea.selectAll("circle").remove();
+        }
 
         
             chartArea.append("path")
