@@ -45,6 +45,31 @@
             font-size: 16px;
             cursor: pointer;
         }
+
+        .yGdpGridlines .domain {
+        display: none;
+        }
+
+        .yMetGridlines .domain {
+        display: none;
+        }
+    
+        .yGdpGridlines line {
+        stroke: rgb(89, 89, 130);
+        }
+
+        .yMetGridlines line {
+        stroke: lightcoral;
+        }
+
+        .yGdpAxis {
+        color: navy;
+        }
+
+        .yMetAxis {
+        color: lightcoral;
+        }
+
     </style>
 </head>
 <body>
@@ -53,6 +78,8 @@
     <svg id="medalChart" height="300" width="300" style="margin-left: 1050px; margin-top: -800px;"></svg>
     <svg id="gdpChart" height="300" width="300" style="margin-left: 1400px; margin-top: -300px;"></svg>
     <svg id="populationChart" height="300" width="300" style="margin-left: 1750px; margin-top: -300px;"></svg>
+    <svg id="lineGraph" height="800" width="1300"></svg>
+    <div id="button-bar"></div>
     <script>
         const svgMap = d3.select("#worldMap");
         const widthMap = svgMap.attr("width");
@@ -222,6 +249,130 @@
         displayPopulationChart();
         
         mapData();
+
+        // Line Graph
+        const olympic = async () => {
+        const olympicsData = await d3.csv("olympics.csv", d3.autoType);
+        // console.log(olympicsData);
+
+        // Line Graph
+        const lineGraph = d3.select("#lineGraph");
+        const widthL = +lineGraph.attr("width");
+        const heightL = +lineGraph.attr("height");
+        const marginL = { top: 10, right: 10, bottom: 50, left: 50 };
+        const graphLWidth = widthL - marginL.left - marginL.right;
+        const graphLHeight = heightL - marginL.top - marginL.bottom;
+
+        let annotations = lineGraph.append("g").attr("id","annotations");
+        let chartArea = lineGraph.append("g").attr("id","points")
+                           .attr("transform",`translate(${marginL.left},${marginL.top})`);
+
+        // Y axis - gdp
+        const gdpExtent = d3.extent(olympicsData, d => d['gdp']);
+        const gdpScale = d3.scaleLinear().domain(gdpExtent).range([graphLHeight, 0]);
+        let gdpAxis = d3.axisLeft(gdpScale)
+        let gdpGridlines = d3.axisLeft(gdpScale)
+                              .tickSize(-graphLWidth+14)
+                              .tickFormat("")
+        annotations.append("g")
+          .attr("class", "yGdpAxis")
+          .attr("transform",`translate(${marginL.left-6},${marginL.top})`)
+          .call(gdpAxis);
+        annotations.append("g")
+          .attr("class", "yGdpGridlines")
+          .attr("transform",`translate(${marginL.left-6},${marginL.top})`)
+          .call(gdpGridlines);
+
+        // Y axis - metal
+        const metalExtent = d3.extent(olympicsData, d => d['total']);
+        const metalScale = d3.scaleLinear().domain(metalExtent).range([graphLHeight, 0]);
+        let metalAxis = d3.axisRight(metalScale)
+        let metalGridlines = d3.axisRight(metalScale)
+                              .tickSize(-graphLWidth+14)
+                              .tickFormat("")
+        annotations.append("g")
+          .attr("class", "yMetAxis")
+          .attr("transform",`translate(${widthL-30},0)`)
+          .call(metalAxis);
+        annotations.append("g")
+          .attr("class", "yMetGridlines")
+          .attr("transform",`translate(${widthL-30},0)`)
+          .call(metalGridlines);
+      
+        // X axis - country
+        const country = d3.map(olympicsData, d => d.country) 
+        const countryScale = d3.scalePoint().domain(country).range([0, graphLWidth]).padding(0.05);
+        let bottomAxis = d3.axisBottom(countryScale);
+        let bottomAxisG = annotations.append("g")
+                                        .attr("class", "x axis")
+                                        .attr("transform",`translate(${marginL.left},${graphLHeight+marginL.top+10})`)
+                                        .call(bottomAxis)
+                                        .selectAll("text")
+                                        .style("text-anchor", "end")
+                                        .attr("transform", "rotate(-45)");
+
+        var gclineGen = d3.line()
+                        .x( d => countryScale(d['country']) )
+                        .y( d => gdpScale(d['gdp']) )
+                        .curve(d3.curveMonotoneX);
+        
+        chartArea.append("path")
+                .datum(olympicsData)
+                .attr("class", "line")
+                .attr("fill", "none")
+                .attr("stroke", "steelblue")
+                .attr("stroke-width", 3)
+                .attr("d", gclineGen);
+
+        chartArea.selectAll("circle").data(olympicsData)
+                .join("circle")
+                .attr("r", 3)
+                .attr("fill", "navy")  
+                .attr("cx", d => countryScale(d['country']) )
+                .attr("cy", d => gdpScale(d['gdp']) );
+
+        var mclineGen = d3.line()
+                .x( d => countryScale(d['country']) )
+                .y( d => metalScale(d['total']) )
+                .curve(d3.curveMonotoneX);
+        
+        chartArea.append("path")
+                .datum(olympicsData)
+                .attr("class", "line")
+                .attr("fill", "none")
+                .attr("stroke", "coral")
+                .attr("stroke-width", 3)
+                .attr("d", mclineGen);
+
+        chartArea.selectAll("circle").data(olympicsData)
+                .join("circle")
+                .attr("r", 3)
+                .attr("fill", "coral")   
+                .attr("cx", d => countryScale(d['country']) )
+                .attr("cy", d => metalScale(d['total']) );
+
+
+        var countryDict = {}
+        olympicsData.forEach( d => {
+            countryDict[d.region] = d.region;
+        });
+        console.log(countryDict);
+
+        const allKeys = Object.keys(countryDict).sort();
+
+        allKeys.forEach( d => {
+        // For each year key, add a new button to the button bar
+        d3.select("div#button-bar")
+          .append("button")
+          .text( d )
+        //   .on("click", function() {
+        //     // When it's clicked, call updateBars to update the chart
+        //     updateline( d );
+        //   })
+      });
+      }
+
+      olympic();
     </script>
 </body>
 </html>
