@@ -12,15 +12,22 @@
     <script>
         // World Map
         const svgMap = d3.select("#worldMap");
-        const widthMap = svg.attr("width");
-        const heightMap = svg.attr("height");
+        const widthMap = svgMap.attr("width");
+        const heightMap = svgMap.attr("height");
         const marginMap = { top: 20, right: 20, bottom: 20, left:20};
         const mapWidth = widthMap - marginMap.left - marginMap.right;
         const mapHeight = heightMap - marginMap.top - marginMap.bottom;
-        const map = svg.append("g")
-                        .attr("transform","translate("+margin.left+","+margin.top+")");
+        const map = svgMap.append("g")
+                        .attr("transform","translate("+marginMap.left+","+marginMap.top+")");
         // World Map code
+        const mapData = async function() {
+        const world = await d3.json("");
 
+
+        const olympicsData = await d3.csv("olympics.csv", d3.autoType);
+        console.log(olympicsData);
+        }
+        mapData();
         // Line Graph
         const svgGraph = d3.select("#lineGraph");
         const widthGraph = +svgGraph.attr("width");
@@ -31,7 +38,7 @@
         const graph = svgGraph.append("g")
                             .attr("transform", "translate(" + marginGraph.left + "," + marginGraph.top + ")");
         // Line Graph code
-        
+
     </script>
 </body>
 </html>
