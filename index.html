@@ -37,7 +37,7 @@
                         .attr("transform","translate("+marginMap.left+","+marginMap.top+")");
         // World Map code
         const mapData = async function() {
-        const world = await d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json");
+        const world = await d3.json("countries-110m.json");
         console.log("worldJson",world);
 
             var countries = topojson.feature(world,world.objects.countries);
