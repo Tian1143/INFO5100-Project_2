@@ -77,18 +77,26 @@
         }
 
         #button-bar button {
-        background-color: grey; 
-        color: pink;         
-        padding: 10px 20px;      
-        font-size: 16px;         
-        border: none;             
-        border-radius: 5px;    
-        cursor: pointer;         
-        transition: background-color 0.3s; 
+        background-color: rgb(255, 255, 255);
+        color: rgb(6, 95, 212);
+        font-size: 16px;
+        border: rgb(6, 95, 212);
+        border-style: solid;
+        border-width: 1px;
+        border-radius: 2px;
+        cursor: pointer;
+        padding-top: 19px;
+        padding-bottom: 19px;
+        padding-left: 26px;
+        padding-right: 26px;
+
+        transition: background-color 0.15s,
+        color 0.15s; 
         }
 
         #button-bar button:hover {
-        background-color: #45a049; 
+        background-color: rgb(6, 95, 212);
+        color: white;
         }
 
     </style>
@@ -280,7 +288,7 @@
         const lineGraph = d3.select("#lineGraph");
         const widthL = +lineGraph.attr("width");
         const heightL = +lineGraph.attr("height");
-        const marginL = { top: 10, right: 50, bottom: 50, left: 50 };
+        const marginL = { top: 10, right: 50, bottom: 80, left: 50 };
         const graphLWidth = widthL - marginL.left - marginL.right;
         const graphLHeight = heightL - marginL.top - marginL.bottom;
 
@@ -326,7 +334,7 @@
         let bottomAxis = d3.axisBottom(countryScale);
         let bottomAxisG = annotations.append("g")
                                         .attr("class", "x axis")
-                                        .attr("transform",`translate(${marginL.left},${graphLHeight+marginL.top})`);
+                                        .attr("transform",`translate(${marginL.left},${graphLHeight+marginL.top+10})`);
 
         var gclineGen = d3.line()
                         .x( d => countryScale(d['country']) )
@@ -346,14 +354,14 @@
                 bottomAxisG.call(d3.axisBottom(countryScale))
                                 .selectAll("text")
                                 .style("text-anchor", "end")
-                                .style("font-size", "12")
+                                .style("font-size", "14")
                                 .attr("transform", "rotate(-30)");
             }
             else {
             bottomAxisG.call(d3.axisBottom(countryScale))
                                 .selectAll("text")
                                 .style("text-anchor", "middle")
-                                .style("font-size", "12");
+                                .style("font-size", "14");
             }
 
             chartArea.selectAll("path").remove();
