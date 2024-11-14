@@ -70,6 +70,27 @@
         color: lightcoral;
         }
 
+        #button-bar {
+        display: flex;   
+        gap: 20px;              
+        margin-top: none;        
+        }
+
+        #button-bar button {
+        background-color: grey; 
+        color: pink;         
+        padding: 10px 20px;      
+        font-size: 16px;         
+        border: none;             
+        border-radius: 5px;    
+        cursor: pointer;         
+        transition: background-color 0.3s; 
+        }
+
+        #button-bar button:hover {
+        background-color: #45a049; 
+        }
+
     </style>
 </head>
 <body>
@@ -305,52 +326,62 @@
         let bottomAxis = d3.axisBottom(countryScale);
         let bottomAxisG = annotations.append("g")
                                         .attr("class", "x axis")
-                                        .attr("transform",`translate(${marginL.left},${graphLHeight+marginL.top+10})`)
-                                        .call(bottomAxis)
-                                        .selectAll("text")
-                                        .style("text-anchor", "end")
-                                        .attr("transform", "rotate(-45)");
+                                        .attr("transform",`translate(${marginL.left},${graphLHeight+marginL.top+10})`);
 
         var gclineGen = d3.line()
                         .x( d => countryScale(d['country']) )
                         .y( d => gdpScale(d['gdp']) )
                         .curve(d3.curveMonotoneX);
-        
-        chartArea.append("path")
-                .datum(olympicsData)
-                .attr("class", "line")
-                .attr("fill", "none")
-                .attr("stroke", "steelblue")
-                .attr("stroke-width", 3)
-                .attr("d", gclineGen);
-
-        chartArea.selectAll("circle").data(olympicsData)
-                .join("circle")
-                .attr("r", 3)
-                .attr("fill", "navy")  
-                .attr("cx", d => countryScale(d['country']) )
-                .attr("cy", d => gdpScale(d['gdp']) );
 
         var mclineGen = d3.line()
-                .x( d => countryScale(d['country']) )
-                .y( d => metalScale(d['total']) )
-                .curve(d3.curveMonotoneX);
+                        .x( d => countryScale(d['country']) )
+                        .y( d => metalScale(d['total']) )
+                        .curve(d3.curveMonotoneX);
+
+        function updateLine(region) {
+            const filteredData = olympicsData.filter(d => d.region === region);
+
+            countryScale.domain(filteredData.map(d => d.country));
+            bottomAxisG.call(d3.axisBottom(countryScale))
+                                .selectAll("text")
+                                .style("text-anchor", "end")
+                                .attr("transform", "rotate(-45)");
+
+            chartArea.selectAll("path").remove();
+            chartArea.selectAll("circle").remove();
+
         
-        chartArea.append("path")
-                .datum(olympicsData)
-                .attr("class", "line")
-                .attr("fill", "none")
-                .attr("stroke", "coral")
-                .attr("stroke-width", 3)
-                .attr("d", mclineGen);
+            chartArea.append("path")
+                    .datum(filteredData)
+                    .attr("class", "line")
+                    .attr("fill", "none")
+                    .attr("stroke", "steelblue")
+                    .attr("stroke-width", 3)
+                    .attr("d", gclineGen);
 
-        chartArea.selectAll("circle").data(olympicsData)
-                .join("circle")
-                .attr("r", 3)
-                .attr("fill", "coral")   
-                .attr("cx", d => countryScale(d['country']) )
-                .attr("cy", d => metalScale(d['total']) );
+            chartArea.selectAll("circle.gdp").data(filteredData)
+                    .join("circle")
+                    .attr("r", 3)
+                    .attr("fill", "navy")  
+                    .attr("cx", d => countryScale(d['country']) )
+                    .attr("cy", d => gdpScale(d['gdp']) );
+            
+            chartArea.append("path")
+                    .datum(filteredData)
+                    .attr("class", "line")
+                    .attr("fill", "none")
+                    .attr("stroke", "coral")
+                    .attr("stroke-width", 3)
+                    .attr("d", mclineGen);
 
+            chartArea.selectAll("circle.met").data(filteredData)
+                    .join("circle")
+                    .attr("r", 3)
+                    .attr("fill", "coral")   
+                    .attr("cx", d => countryScale(d['country']) )
+                    .attr("cy", d => metalScale(d['total']) );
+
+    }
 
         var countryDict = {}
         olympicsData.forEach( d => {
@@ -365,11 +396,13 @@
         d3.select("div#button-bar")
           .append("button")
           .text( d )
-        //   .on("click", function() {
-        //     // When it's clicked, call updateBars to update the chart
-        //     updateline( d );
-        //   })
+          .on("click", function() {
+            updateLine( d );
+          })
       });
+
+    //   updateLine(allKeys[0]);
+
       }
 
       olympic();
