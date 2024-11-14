@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project 2</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
+    <style>
+    .country {
+
+      fill: lightgrey;
+    }
+
+    .gridlines .domain {
+      display: none;
+    }
+    
+    .gridlines line {
+      stroke: #aaa;
+    }
+
+    </style>
+</head>
+<body>
+    <svg id="worldMap" height="800" width="1000"></svg>
+    <svg id="lineGraph" height="1000" width="1300"></svg>
+    <script>
+        // World Map
+        const svgMap = d3.select("#worldMap");
+        const widthMap = svgMap.attr("width");
+        const heightMap = svgMap.attr("height");
+        const marginMap = { top: 20, right: 20, bottom: 20, left:20};
+        const mapWidth = widthMap - marginMap.left - marginMap.right;
+        const mapHeight = heightMap - marginMap.top - marginMap.bottom;
+        const map = svgMap.append("g")
+                        .attr("transform","translate("+marginMap.left+","+marginMap.top+")");
+        // World Map code
+        const mapData = async function() {
+        const world = await d3.json("countries_with_medals_no_antarctica.json");
+        console.log("worldJson",world);
+
+
+            var countries = topojson.feature(world,world.objects.countries);
+            console.log("Countries:", countries);
+            var countriesMesh = topojson.mesh(world,world.objects.countries); 
+            console.log("CountriesMesh:", countriesMesh);
+            var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], countries);
+            var path = d3.geoPath().projection(projection);
+
+            let graticule = d3.geoGraticule10();
+                console.log(graticule);
+                map.append("path").attr("class","graticule").attr("d", path(graticule));
+
+            let countryPaths = map.selectAll("path.country").data(countries.features)
+                       .join("path")
+                       .attr("class", "country")
+                       .attr("note", d => d.id)  
+                       .attr("d", path);
+                       //.on('mouseover',  mouseEntersState )
+                       //.on('mouseout',  mouseLeavesState );
+    
+            map.append("path").datum(countriesMesh)
+                .attr("fill", "none")
+                .attr("d", path)
+                .attr("stroke", "black")
+                .attr("stroke-width", 1);
+
+
+        }
+        mapData();
+
+
+        // Line Graph
+        const olympic = async () => {
+        const olympicsData = await d3.csv("olympics.csv", d3.autoType);
+        console.log(olympicsData);
+
+        // var countryDict = {}
+        //     olympicsData.forEach( d => {
+        //         countryDict[d.country] = d;
+        //     });
+        //     console.log(countryDict);
+
+        // Line Graph
+        const lineGraph = d3.select("#lineGraph");
+        const widthL = +lineGraph.attr("width");
+        const heightL = +lineGraph.attr("height");
+        const marginL = { top: 10, right: 10, bottom: 50, left: 50 };
+        const graphLWidth = widthL - marginL.left - marginL.right;
+        const graphLHeight = heightL - marginL.top - marginL.bottom;
+
+        let annotations = lineGraph.append("g").attr("id","annotations");
+        let chartArea = lineGraph.append("g").attr("id","points")
+                           .attr("transform",`translate(${marginL.left},${marginL.top})`);
+
+        // Y axis - gdp
+        const gdpExtent = d3.extent(olympicsData, d => d['gdp']);
+        const gdpScale = d3.scaleLinear().domain(gdpExtent).range([graphLHeight, 0]);
+        let gdpAxis = d3.axisLeft(gdpScale)
+        let gdpGridlines = d3.axisLeft(gdpScale)
+                              .tickSize(-graphLWidth-10)
+                              .tickFormat("")
+        annotations.append("g")
+          .attr("class", "yGdp axis")
+          .attr("transform",`translate(${marginL.left-6},${marginL.top})`)
+          .call(gdpAxis)
+        annotations.append("g")
+          .attr("class", "yGdp gridlines")
+          .attr("transform",`translate(${marginL.left-6},${marginL.top})`)
+          .call(gdpGridlines);
+
+        // Y axis - metal
+        const metalExtent = d3.extent(olympicsData, d => d['total']);
+        const metalScale = d3.scaleLinear().domain(metalExtent).range([graphLHeight, 0]);
+        let metalAxis = d3.axisRight(metalScale)
+        let metalGridlines = d3.axisRight(metalScale)
+                              .tickSize(-graphLWidth-10)
+                              .tickFormat("")
+        annotations.append("g")
+          .attr("class", "yMet axis")
+          .attr("transform",`translate(${widthL-6},0)`)
+          .call(metalAxis)
+        annotations.append("g")
+          .attr("class", "yMet gridlines")
+          .attr("transform",`translate(${widthL-6},0)`)
+          .call(metalGridlines);
+      
+        // X axis - country
+        const country = d3.map(olympicsData, d => d.country) 
+        const countryScale = d3.scalePoint().domain(country).range([0, graphLWidth]).padding(0.05);
+        let bottomAxis = d3.axisBottom(countryScale);
+        let bottomAxisG = annotations.append("g")
+                                    .attr("class", "x axis")
+                                    .attr("transform",`translate(${marginL.left},${graphLHeight+marginL.top+10})`);
+
+        var gclineGen = d3.line()
+                        .x( d => countryScale(d['country']) )
+                        .y( d => gdpScale(d['gdp']) )
+                        .curve(d3.curveMonotoneX);
+        
+        chartArea.append("path")
+                .datum(olympicsData)
+                .attr("class", "line")
+                .attr("fill", "none")
+                .attr("stroke", "steelblue")
+                .attr("stroke-width", 3)
+                .attr("d", gclineGen);
+
+        chartArea.selectAll("circle").data(olympicsData)
+                .join("circle")
+                .attr("r", 3)
+                .attr("fill", "navy")  
+                .attr("cx", d => countryScale(d['country']) )
+                .attr("cy", d => gdpScale(d['gdp']) );
+
+        var mclineGen = d3.line()
+                .x( d => countryScale(d['country']) )
+                .y( d => metalScale(d['total']) )
+                .curve(d3.curveMonotoneX);
+        
+        chartArea.append("path")
+                .datum(olympicsData)
+                .attr("class", "line")
+                .attr("fill", "none")
+                .attr("stroke", "purple")
+                .attr("stroke-width", 3)
+                .attr("d", mclineGen);
+
+        chartArea.selectAll("circle").data(olympicsData)
+                .join("circle")
+                .attr("r", 3)
+                .attr("fill", "navy")   
+                .attr("cx", d => countryScale(d['country']) )
+                .attr("cy", d => metalScale(d['total']) );
+      }
+
+      olympic();
+
+    </script>
+</body>
+</html>
