@@ -30,6 +30,7 @@
         }
 
         .button-container {
+            text-align: center;
             margin: 10px 0;
         }
 
@@ -143,18 +144,40 @@
             font-size: 40px;
             text-align: center;
         }
+        .mapContainer {
+            display: flex;
+            gap: 100px; 
+        }
+        .box {
+        background-color: #dfdfdf; 
+        border: 1px solid #ccc; 
+        border-radius: 10px; 
+        padding: 15px;
+        width: 300px;
+        height:100px;
+        font-family: Arial, sans-serif; 
+        font-size: 20px; 
+        color: #333;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        margin-top: 100px;
+        margin-left: 40px;
+        }
+        .infoContainer {
+            display: flex;
+            flex-direction: column;
+        }
     </style>
 </head>
 <body>
     <p class="title">Olympic Participation and Medal Wins by Country on 2023</p>
     <div class="button-container">
-        <button class="color-button" onclick="applyColorScheme('gdp')">Color by GDP</button>
-        <button class="color-button" onclick="applyColorScheme('total')">Color by Total Medals</button>
-        <button class="color-button" onclick="applyColorScheme('population')">Color by Population</button>
+        <button style="background-color: lightsteelblue;" class="color-button" onclick="applyColorScheme('gdp')">Color by GDP</button>
+        <button style="background-color: rgb(218, 173, 60);"class="color-button" onclick="applyColorScheme('total')">Color by Total Medals</button>
+        <button style="background-color: rgb(120, 220, 84);" class="color-button" onclick="applyColorScheme('population')">Color by Population</button>
         <button class="reset-button" onclick="resetZoom()">Reset</button>
     </div>
+    <div class="mapContainer">
     <svg id="worldMap" height="800" width="1000">
-        
         <defs>
             <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
                 <feGaussianBlur stdDeviation="4" result="coloredBlur" />
@@ -165,7 +188,12 @@
             </filter>
         </defs>
     </svg>
+    <div class="infoContainer">
+    <p class="box">Gray areas represent countries that either did not win any Olympic medals or did not participate in the Olympics.</p>
     <svg id="legend" width="350" height="60" style="margin-left: 50px; margin-top: 20px;"></svg>
+    </div>
+    </div>
+    
     <div id="charts">
         <svg id="medalChart" height="300" width="300"></svg>
         <svg id="gdpChart" height="300" width="300"></svg>
@@ -476,7 +504,8 @@
                         .curve(d3.curveMonotoneX);
 
         function updateLine(region) {
-            const filteredData = olympicsData.filter(d => d.region === region);
+            const filteredData = olympicsData.filter(d => d.region === region)
+                                            .sort((a, b) =>{ return b.gdp - a.gdp;});
 
             countryScale.domain(filteredData.map(d => d.country));
             if (region === "Asia" || region === "Europe") {
@@ -540,11 +569,15 @@
         // For each year key, add a new button to the button bar
         d3.select("div#button-bar")
           .append("button")
-          .text( d )
+          .text( d )         
           .on("click", function() {
             updateLine( d );
           })
         });
+
+        d3.select("div#button-bar")
+        .attr("style", "display: flex; justify-content: center;"); 
+
 
       }
 
