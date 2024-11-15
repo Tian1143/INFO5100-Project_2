@@ -3,22 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project 2 with Pan and Zoom</title>
+    <title>Interactive Map with Glow Effect and Charts</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/topojson@3"></script>
     <style>
         .country {
-            fill: lightgrey;
             cursor: pointer;
+            stroke: #000;
         }
+
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            width: 120px;
+            height: auto;
+            padding: 5px;
+            font: 12px sans-serif;
+            background: lightsteelblue;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+
+        .glow {
+            filter: url(#glow);
+        }
+
+        .button-container {
+            margin: 10px 0;
+        }
+
+        .color-button {
+            padding: 5px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .reset-button {
+            padding: 5px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+
+        #charts {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
         
         .country.medal {
             fill: rgb(254, 254, 193);
         }
         
-        .country:hover {
-            fill: rgb(255, 178, 34);
-        }
+       
         
         .tooltip {
             position: absolute;
@@ -107,26 +147,37 @@
 </head>
 <body>
     <p class="title">Olympic Participation and Medal Wins by Country on 2023</p>
-    <svg id="worldMap" height="700" width="1100" style="background-color: rgb(218, 235, 250); margin-left: 50px;"></svg>
-    <button class="reset-button" onclick="resetZoom()">Reset</button>
-    
-    <div style="margin-left: 50px;">
-    <svg id="medalChart" height="300" width="300" ></svg><!--style="margin-left: 60px; margin-top: 10px;"-->
-    <svg id="gdpChart" height="300" width="300"></svg><!--style="margin-left: 60px; margin-top: 10px;"-->
-    <svg id="populationChart" height="300" width="300" ></svg><!--style="margin-left: 60px; margin-top: 10px;"-->
+    <div class="button-container">
+        <button class="color-button" onclick="applyColorScheme('gdp')">Color by GDP</button>
+        <button class="color-button" onclick="applyColorScheme('total')">Color by Total Medals</button>
+        <button class="color-button" onclick="applyColorScheme('population')">Color by Population</button>
+        <button class="reset-button" onclick="resetZoom()">Reset</button>
     </div>
-    <p class="title">GDP and Medals comparison between different countries.</p>
+    <svg id="worldMap" height="800" width="1000">
+        
+        <defs>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                <feMerge>
+                    <feMergeNode in="coloredBlur" />
+                    <feMergeNode in="SourceGraphic" />
+                </feMerge>
+            </filter>
+        </defs>
+    </svg>
+    <svg id="legend" width="350" height="60" style="margin-left: 50px; margin-top: 20px;"></svg>
+    <div id="charts">
+        <svg id="medalChart" height="300" width="300"></svg>
+        <svg id="gdpChart" height="300" width="300"></svg>
+        <svg id="populationChart" height="300" width="300"></svg>
+    </div>
+    <p class="title">GDP and Medals comparision between different countries.</p>
     <svg id="lineGraph" height="700" width="1000" style="margin-left: 50px;"></svg>
     <div id="button-bar"></div>
     <script>
         const svgMap = d3.select("#worldMap");
         const widthMap = svgMap.attr("width");
         const heightMap = svgMap.attr("height");
-        const marginMap = { top: 20, right: 20, bottom: 20, left: 20 };
-        const mapWidth = widthMap - marginMap.left - marginMap.right;
-        const mapHeight = heightMap - marginMap.top - marginMap.bottom;
-
-        
         const mapViewport = svgMap.append("g");
 
         const tooltip = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
@@ -134,84 +185,155 @@
         let maxMedals = 130;
         let maxGDP = 90000;
         let maxPopulation = 2000;
+        let countries;
 
-        const mapData = async function() {
+        const mapData = async function () {
             const world = await d3.json("countries_with_medals_no_antarctica.json");
 
-            const countries = topojson.feature(world, world.objects.countries);
-            const countriesMesh = topojson.mesh(world, world.objects.countries);
+            countries = topojson.feature(world, world.objects.countries);
 
-            const projection = d3.geoMercator().fitSize([mapWidth, mapHeight], countries);
+            countries.features.forEach(country => {
+                const props = country.properties;
+                maxGDP = Math.max(maxGDP, props.gdp || 0);
+                maxMedals = Math.max(maxMedals, props.total || 0);
+                maxPopulation = Math.max(maxPopulation, props.population || 0);
+            });
+
+            const projection = d3.geoMercator().fitSize([widthMap, heightMap], countries);
             const path = d3.geoPath().projection(projection);
 
             mapViewport.selectAll("path.country")
                 .data(countries.features)
                 .join("path")
-                .attr("class", d => d.properties.total > 0 ? "country medal" : "country")
+                .attr("class", "country")
                 .attr("d", path)
                 .on("mouseover", (event, d) => {
+                    
                     tooltip.transition().duration(200).style("opacity", .9);
                     tooltip.html(`${d.properties.name}`)
                         .style("left", (event.pageX + 10) + "px")
                         .style("top", (event.pageY - 28) + "px");
+
+                    
+                    d3.select(event.target).classed("glow", true);
                 })
-                .on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0))
+                .on("mouseout", (event, d) => {
+                    // 隐藏工具提示
+                    tooltip.transition().duration(500).style("opacity", 0);
+
+                    // 移除光晕效果
+                    d3.select(event.target).classed("glow", false);
+                })
                 .on("click", (event, d) => {
                     displayMedalChart(d.properties);
                     displayGdpChart(d.properties);
                     displayPopulationChart(d.properties);
-
-                    // Zoom into the selected country
                     zoomToCountry(d);
                 });
 
-            mapViewport.append("path")
-                .datum(countriesMesh)
-                .attr("fill", "none")
-                .attr("d", path)
-                .attr("stroke", "black")
-                .attr("stroke-width", 1);
+            // Set initial color scheme
+            applyColorScheme('gdp');
 
-            
             const zoom = d3.zoom()
-                .scaleExtent([1, 10]) 
+                .scaleExtent([1, 10])
                 .on("zoom", (event) => {
                     mapViewport.attr("transform", event.transform);
                 });
 
             svgMap.call(zoom);
 
-            
+            // Function to zoom into a selected country
             function zoomToCountry(countryData) {
-                const [[x0, y0], [x1, y1]] = path.bounds(countryData); 
-                const countryWidth = x1 - x0;
-                const countryHeight = y1 - y0;
-                const scale = Math.max(1, Math.min(8, 0.9 / Math.max(countryWidth / mapWidth, countryHeight / mapHeight)));
+                const [[x0, y0], [x1, y1]] = path.bounds(countryData);
+                const scale = Math.max(1, Math.min(8, 0.9 / Math.max((x1 - x0) / widthMap, (y1 - y0) / heightMap)));
                 const translate = [
-                    mapWidth / 2 - scale * (x0 + x1) / 2,
-                    mapHeight / 2 - scale * (y0 + y1) / 2
+                    widthMap / 2 - scale * (x0 + x1) / 2,
+                    heightMap / 2 - scale * (y0 + y1) / 2
                 ];
-
                 svgMap.transition()
                     .duration(750)
-                    .call(
-                        zoom.transform,
-                        d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
-                    );
+                    .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
             }
 
-            
-            window.resetZoom = function() {
-                
-                svgMap.transition()
-                    .duration(750)
-                    .call(zoom.transform, d3.zoomIdentity);
-
-                
+            // Function to reset zoom and reset charts
+            window.resetZoom = function () {
+                svgMap.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
                 displayMedalChart({ gold: 0, silver: 0, bronze: 0, total: 0 });
                 displayGdpChart({ gdp: 0 });
                 displayPopulationChart({ population: 0 });
+            };
+        };
+
+        function applyColorScheme(indicator) {
+            let colorScale, minValue, maxValue;
+
+            if (indicator === 'gdp') {
+                colorScale = d3.scaleSequential(d3.interpolateBlues).domain([0, maxGDP]);
+                minValue = 0;
+                maxValue = maxGDP;
+            } else if (indicator === 'total') {
+                colorScale = d3.scaleSequential(d3.interpolateOranges).domain([0, maxMedals]);
+                minValue = 0;
+                maxValue = maxMedals;
+            } else if (indicator === 'population') {
+                colorScale = d3.scaleSequential(d3.interpolateGreens).domain([0, maxPopulation]);
+                minValue = 0;
+                maxValue = maxPopulation;
             }
+
+            mapViewport.selectAll("path.country")
+                .transition()
+                .duration(500)
+                .attr("fill", d => {
+                    const value = d.properties[indicator] || 0;
+                    return value > 0 ? colorScale(value) : "#ccc";
+                });
+
+            // Draw the legend
+            drawLegend(colorScale, minValue, maxValue, "legend");
+        }
+
+        function drawLegend(colorScale, minValue, maxValue, legendId) {
+            const legendWidth = 300;
+            const legendHeight = 20;
+
+            const legendSvg = d3.select(`#${legendId}`);
+            legendSvg.selectAll("*").remove();
+
+            const legendScale = d3.scaleLinear()
+                .domain([minValue, maxValue])
+                .range([0, legendWidth]);
+
+            const legendGradient = legendSvg.append("defs")
+                .append("linearGradient")
+                .attr("id", `${legendId}-gradient`)
+                .attr("x1", "0%")
+                .attr("x2", "100%")
+                .attr("y1", "0%")
+                .attr("y2", "0%");
+
+            const steps = 100;
+            const stepValues = d3.range(steps + 1).map(d => minValue + (d * (maxValue - minValue) / steps));
+            stepValues.forEach((value, index) => {
+                legendGradient.append("stop")
+                    .attr("offset", `${(index / steps) * 100}%`)
+                    .attr("stop-color", colorScale(value));
+            });
+
+            legendSvg.append("rect")
+                .attr("x", 20)
+                .attr("y", 20)
+                .attr("width", legendWidth)
+                .attr("height", legendHeight)
+                .style("fill", `url(#${legendId}-gradient)`);
+
+            const legendAxis = d3.axisBottom(legendScale)
+                .ticks(5)
+                .tickFormat(d3.format(".2s"));
+
+            legendSvg.append("g")
+                .attr("transform", `translate(20,${20 + legendHeight})`)
+                .call(legendAxis);
         }
 
         function createChart(svgSelector, data, maxValue, color) {
@@ -225,43 +347,42 @@
             const chart = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
             const xScale = d3.scaleBand()
-                             .domain(data.map(d => d.category))
-                             .range([0, width])
-                             .padding(0.1);
+                .domain(data.map(d => d.category))
+                .range([0, width])
+                .padding(0.1);
 
             const yScale = d3.scaleLinear()
-                             .domain([0, maxValue])
-                             .range([height, 0]);
+                .domain([0, maxValue])
+                .range([height, 0]);
 
             chart.append("g")
-                 .attr("transform", `translate(0,${height})`)
-                 .call(d3.axisBottom(xScale));
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(xScale));
 
             chart.append("g")
-                 .call(d3.axisLeft(yScale));
+                .call(d3.axisLeft(yScale));
 
-            
             chart.selectAll(".bar")
-                 .data(data)
-                 .join("rect")
-                 .attr("class", "bar")
-                 .attr("x", d => xScale(d.category))
-                 .attr("y", d => yScale(d.value))
-                 .attr("width", xScale.bandwidth())
-                 .attr("height", d => height - yScale(d.value))
-                 .attr("fill", color);
+                .data(data)
+                .join("rect")
+                .attr("class", "bar")
+                .attr("x", d => xScale(d.category))
+                .attr("y", d => yScale(d.value))
+                .attr("width", xScale.bandwidth())
+                .attr("height", d => height - yScale(d.value))
+                .attr("fill", color);
 
-            
             chart.selectAll(".label")
-                 .data(data)
-                 .join("text")
-                 .attr("class", "label")
-                 .attr("x", d => xScale(d.category) + xScale.bandwidth() / 2)
-                 .attr("y", d => yScale(d.value) - 5)
-                 .text(d => d.value);
+                .data(data)
+                .join("text")
+                .attr("class", "label")
+                .attr("x", d => xScale(d.category) + xScale.bandwidth() / 2)
+                .attr("y", d => yScale(d.value) - 5)
+                .attr("text-anchor", "middle")
+                .text(d => d.value);
         }
 
-        function displayMedalChart(data = {gold: 0, silver: 0, bronze: 0, total: 0}) {
+        function displayMedalChart(data = { gold: 0, silver: 0, bronze: 0, total: 0 }) {
             const medalData = [
                 { category: "Gold", value: data.gold || 0 },
                 { category: "Silver", value: data.silver || 0 },
@@ -271,22 +392,21 @@
             createChart("#medalChart", medalData, maxMedals, "steelblue");
         }
 
-        function displayGdpChart(data = {gdp: 0}) {
+        function displayGdpChart(data = { gdp: 0 }) {
             const gdpData = [{ category: "GDP", value: data.gdp || 0 }];
             createChart("#gdpChart", gdpData, maxGDP, "green");
         }
 
-        function displayPopulationChart(data = {population: 0}) {
+        function displayPopulationChart(data = { population: 0 }) {
             const populationData = [{ category: "Population", value: data.population || 0 }];
             createChart("#populationChart", populationData, maxPopulation, "orange");
         }
 
-        
         displayMedalChart();
         displayGdpChart();
         displayPopulationChart();
-        
         mapData();
+
 
         // Line Graph
         const olympic = async () => {
