@@ -194,47 +194,122 @@
             display: none;
         }
 
-        .mapContainer,
-        #lineGraphContainer,
-        #charts {
-            background-color: #f9f9f9;
-            /* 浅灰色背景 */
-            border-radius: 15px;
-            /* 圆角 */
-            padding: 20px;
-            /* 内边距 */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            /* 阴影 */
-            margin: 20px auto;
-            /* 居中 */
-            max-width: 3000px;
-            /* 限制宽度 */
-            overflow: hidden;
-            /* 防止子元素溢出 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
         }
 
-        /* 响应式布局 */
+        h1,
+        h2 {
+            text-align: center;
+            color: #333;
+            margin: 20px 0;
+        }
+
+
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .color-button,
+        .reset-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .color-button:hover,
+        .reset-button:hover {
+            background-color: #ddd;
+        }
+
+        .reset-button {
+            background-color: #eee;
+        }
+
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .mapContainer,
+        #charts,
+        #lineGraphContainer {
+            background-color: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            max-width: 90%;
+            overflow: hidden;
+        }
+
+        .mapContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .infoContainer {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .box {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 14px;
+            text-align: justify;
+            color: #333;
+        }
+
+        #charts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        #lineGraphContainer {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+
+        svg {
+            display: block;
+            margin: 0 auto;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+
         @media (max-width: 768px) {
             .mapContainer {
                 flex-direction: column;
-                /* 垂直排列 */
+                align-items: center;
             }
 
             #charts {
                 flex-direction: column;
-                /* 折线图垂直排列 */
-                gap: 10px;
-            }
-        }
-
-        @media (min-width: 768px) {
-            #charts {
-                display: flex;
-                /* 并排排列 */
-                justify-content: space-between;
-                /* 均匀分布 */
-                gap: 20px;
-                /* 间距 */
+                align-items: center;
             }
         }
     </style>
@@ -340,7 +415,7 @@
                     zoomToCountry(d);
                 });
 
-            // Set initial color scheme
+
             applyColorScheme('gdp');
 
             const zoom = d3.zoom()
@@ -351,7 +426,7 @@
 
             svgMap.call(zoom);
 
-            // Function to zoom into a selected country
+
             function zoomToCountry(countryData) {
                 const [[x0, y0], [x1, y1]] = path.bounds(countryData);
                 const scale = Math.max(1, Math.min(8, 0.9 / Math.max((x1 - x0) / widthMap, (y1 - y0) / heightMap)));
@@ -364,7 +439,7 @@
                     .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
             }
 
-            // Function to reset zoom and reset charts
+
             window.resetZoom = function () {
                 svgMap.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
                 displayMedalChart({ gold: 0, silver: 0, bronze: 0, total: 0 });
@@ -398,7 +473,7 @@
                     return value > 0 ? colorScale(value) : "#ccc";
                 });
 
-            // Draw the legend
+
             drawLegend(colorScale, minValue, maxValue, "legend");
         }
 
@@ -531,13 +606,13 @@
             const chartArea = svg.append("g")
                 .attr("transform", `translate(${margin.left},${margin.top})`);
 
-            // Scales
-            const gdpScale = d3.scaleLinear().range([graphHeight, 0]); // GDP scale
-            const medalScale = d3.scaleLinear().range([graphHeight, 0]); // Medal scale
-            const gridlineScale = d3.scaleLinear().range([graphHeight, 0]); // Shared gridline scale
-            const countryScale = d3.scalePoint().range([0, graphWidth]).padding(0.5); // Country scale
 
-            // Axes
+            const gdpScale = d3.scaleLinear().range([graphHeight, 0]);
+            const medalScale = d3.scaleLinear().range([graphHeight, 0]);
+            const gridlineScale = d3.scaleLinear().range([graphHeight, 0]);
+            const countryScale = d3.scalePoint().range([0, graphWidth]).padding(0.5);
+
+
             const gdpAxis = svg.append("g")
                 .attr("class", "yGdpAxis")
                 .attr("transform", `translate(${margin.left},${margin.top})`);
@@ -549,32 +624,32 @@
             const xAxis = svg.append("g")
                 .attr("transform", `translate(${margin.left},${height - margin.bottom})`);
 
-            // Add gridlines
+
             const gridlines = chartArea.append("g").attr("class", "gridline");
 
-            // Add focus line for mouse hover
+
             const focusLine = chartArea.append("line")
                 .attr("class", "focus-line")
                 .attr("y1", 0)
                 .attr("y2", graphHeight)
                 .style("display", "none");
 
-            // Update chart with filtered data
+
             function updateChart(filteredData) {
-                // Sort by GDP descending
+
                 filteredData.sort((a, b) => b.gdp - a.gdp);
 
-                // Update scales
+
                 gdpScale.domain(d3.extent(filteredData, d => d.gdp));
                 medalScale.domain(d3.extent(filteredData, d => d.total));
 
-                // Compute shared extent for gridlines alignment
+
                 const sharedExtent = [0, Math.max(...gdpScale.domain(), ...medalScale.domain())];
                 gridlineScale.domain(sharedExtent);
 
                 countryScale.domain(filteredData.map(d => d.country));
 
-                // Update axes
+
                 gdpAxis.call(d3.axisLeft(gdpScale));
                 medalAxis.call(d3.axisRight(medalScale));
                 xAxis.call(d3.axisBottom(countryScale))
@@ -582,16 +657,16 @@
                     .attr("transform", "rotate(-45)")
                     .style("text-anchor", "end");
 
-                // Update gridlines
+
                 gridlines.call(d3.axisLeft(gridlineScale)
                     .tickSize(-graphWidth)
                     .tickFormat(""));
 
-                // Remove existing elements
+
                 chartArea.selectAll(".line").remove();
                 chartArea.selectAll(".circle").remove();
 
-                // Draw GDP line
+
                 const gdpLine = d3.line()
                     .x(d => countryScale(d.country))
                     .y(d => gdpScale(d.gdp))
@@ -605,7 +680,7 @@
                     .attr("stroke-width", 2)
                     .attr("d", gdpLine);
 
-                // Draw Medal line
+
                 const medalLine = d3.line()
                     .x(d => countryScale(d.country))
                     .y(d => medalScale(d.total))
@@ -619,7 +694,7 @@
                     .attr("stroke-width", 2)
                     .attr("d", medalLine);
 
-                // Add circles for GDP
+
                 chartArea.selectAll(".gdp-circle")
                     .data(filteredData)
                     .join("circle")
@@ -629,7 +704,7 @@
                     .attr("cx", d => countryScale(d.country))
                     .attr("cy", d => gdpScale(d.gdp));
 
-                // Add circles for Medals
+
                 chartArea.selectAll(".medal-circle")
                     .data(filteredData)
                     .join("circle")
@@ -639,11 +714,11 @@
                     .attr("cx", d => countryScale(d.country))
                     .attr("cy", d => medalScale(d.total));
 
-                // Mouse interaction
+
                 chartArea.on("mousemove", function (event) {
                     const [mouseX] = d3.pointer(event, this);
 
-                    // Find closest data point
+
                     const step = graphWidth / (filteredData.length - 1);
                     const index = Math.round(mouseX / step);
                     const selectedData = filteredData[index];
@@ -672,7 +747,7 @@
                 });
             }
 
-            // Add buttons for filtering by region
+
             const buttonBar = d3.select("#button-bar");
             const continents = Array.from(new Set(olympicsData.map(d => d.region))).sort();
 
@@ -685,7 +760,7 @@
                     });
             });
 
-            // Initialize with Asia's data
+
             const initialData = olympicsData.filter(d => d.region === "Asia");
             updateChart(initialData);
         };
