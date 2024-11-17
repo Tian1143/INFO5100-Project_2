@@ -654,8 +654,9 @@
                 medalAxis.call(d3.axisRight(medalScale));
                 xAxis.call(d3.axisBottom(countryScale))
                     .selectAll("text")
-                    .attr("transform", "rotate(-45)")
-                    .style("text-anchor", "end");
+                    .attr("transform", "rotate(-38)")
+                    .style("text-anchor", "end")
+                    .style("font-size", "12");
 
 
                 gridlines.call(d3.axisLeft(gridlineScale)
