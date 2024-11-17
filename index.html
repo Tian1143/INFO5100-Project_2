@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -54,13 +55,13 @@
             margin-top: 20px;
         }
 
-        
+
         .country.medal {
             fill: rgb(254, 254, 193);
         }
-        
-       
-        
+
+
+
         .tooltip {
             position: absolute;
             text-align: center;
@@ -73,7 +74,7 @@
             border-radius: 8px;
             pointer-events: none;
         }
-        
+
         .label {
             font-size: 12px;
             text-anchor: middle;
@@ -88,128 +89,200 @@
         }
 
         .yGdpGridlines .domain {
-        display: none;
+            display: none;
         }
 
         .yMetGridlines .domain {
-        display: none;
+            display: none;
         }
-    
+
         .yGdpGridlines line {
-        stroke: rgb(89, 89, 130);
+            stroke: rgb(89, 89, 130);
         }
 
         .yMetGridlines line {
-        stroke: lightcoral;
+            stroke: lightcoral;
         }
 
         .yGdpAxis {
-        color: navy;
+            color: navy;
         }
 
         .yMetAxis {
-        color: lightcoral;
+            color: lightcoral;
         }
 
         #button-bar {
-        display: flex;   
-        gap: 20px;              
-        margin-top: none;   
-        justify-content: center;     
+            display: flex;
+            gap: 20px;
+            margin-top: none;
+            justify-content: center;
         }
 
         #button-bar button {
-        background-color: rgb(255, 255, 255);
-        color: rgb(6, 95, 212);
-        font-size: 16px;
-        border: rgb(6, 95, 212);
-        border-style: solid;
-        border-width: 1px;
-        border-radius: 2px;
-        cursor: pointer;
-        padding-top: 19px;
-        padding-bottom: 19px;
-        padding-left: 26px;
-        padding-right: 26px;
-            
-        transition: background-color 0.15s,
-        color 0.15s; 
+            background-color: rgb(255, 255, 255);
+            color: rgb(6, 95, 212);
+            font-size: 16px;
+            border: rgb(6, 95, 212);
+            border-style: solid;
+            border-width: 1px;
+            border-radius: 2px;
+            cursor: pointer;
+            padding-top: 19px;
+            padding-bottom: 19px;
+            padding-left: 26px;
+            padding-right: 26px;
+
+            transition: background-color 0.15s,
+                color 0.15s;
         }
 
         #button-bar button:hover {
-        background-color: rgb(6, 95, 212);
-        color: white;
+            background-color: rgb(6, 95, 212);
+            color: white;
         }
 
-        .title{
+        .title {
             font-size: 40px;
             text-align: center;
         }
+
         .mapContainer {
             display: flex;
-            gap: 100px; 
+            gap: 100px;
         }
+
         .box {
-        background-color: #dfdfdf; 
-        border: 1px solid #ccc; 
-        border-radius: 10px; 
-        padding: 15px;
-        width: 300px;
-        height:100px;
-        font-family: Arial, sans-serif; 
-        font-size: 20px; 
-        color: #333;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        margin-top: 100px;
-        margin-left: 40px;
+            background-color: #dfdfdf;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 15px;
+            width: 300px;
+            height: 100px;
+            font-family: Arial, sans-serif;
+            font-size: 20px;
+            color: #333;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 100px;
+            margin-left: 40px;
         }
+
         .infoContainer {
             display: flex;
             flex-direction: column;
         }
-        .lineCon{
+
+        .lineCon {
             display: flex;
 
         }
+
+        .hover-tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.75);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            pointer-events: none;
+            font-size: 12px;
+        }
+
+        .focus-line {
+            stroke: darkgray;
+            stroke-width: 2;
+            stroke-dasharray: 4;
+            display: none;
+        }
+
+        .mapContainer,
+        #lineGraphContainer,
+        #charts {
+            background-color: #f9f9f9;
+            /* 浅灰色背景 */
+            border-radius: 15px;
+            /* 圆角 */
+            padding: 20px;
+            /* 内边距 */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            /* 阴影 */
+            margin: 20px auto;
+            /* 居中 */
+            max-width: 3000px;
+            /* 限制宽度 */
+            overflow: hidden;
+            /* 防止子元素溢出 */
+        }
+
+        /* 响应式布局 */
+        @media (max-width: 768px) {
+            .mapContainer {
+                flex-direction: column;
+                /* 垂直排列 */
+            }
+
+            #charts {
+                flex-direction: column;
+                /* 折线图垂直排列 */
+                gap: 10px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            #charts {
+                display: flex;
+                /* 并排排列 */
+                justify-content: space-between;
+                /* 均匀分布 */
+                gap: 20px;
+                /* 间距 */
+            }
+        }
     </style>
 </head>
+
 <body>
+
     <p class="title">Olympic Participation and Medal Wins by Country on 2024</p>
+
     <div class="button-container">
-        <button style="background-color: lightsteelblue;" class="color-button" onclick="applyColorScheme('gdp')">Color by GDP</button>
-        <button style="background-color: rgb(218, 173, 60);"class="color-button" onclick="applyColorScheme('total')">Color by Total Medals</button>
-        <button style="background-color: rgb(120, 220, 84);" class="color-button" onclick="applyColorScheme('population')">Color by Population</button>
+        <button style="background-color: lightsteelblue;" class="color-button" onclick="applyColorScheme('gdp')">Color
+            by GDP</button>
+        <button style="background-color: rgb(218, 173, 60);" class="color-button"
+            onclick="applyColorScheme('total')">Color by Total Medals</button>
+        <button style="background-color: rgb(120, 220, 84);" class="color-button"
+            onclick="applyColorScheme('population')">Color by Population</button>
         <button class="reset-button" onclick="resetZoom()">Scale View Reset</button>
     </div>
     <div class="mapContainer">
-    <svg id="worldMap" height="800" width="1000">
-        <defs>
-            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="4" result="coloredBlur" />
-                <feMerge>
-                    <feMergeNode in="coloredBlur" />
-                    <feMergeNode in="SourceGraphic" />
-                </feMerge>
-            </filter>
-        </defs>
-    </svg>
-    <div class="infoContainer">
-    <p class="box">Gray areas represent countries that either did not win any Olympic medals or did not participate in the Olympics.</p>
-    <svg id="legend" width="350" height="60" style="margin-left: 50px; margin-top: 20px;"></svg>
+        <svg id="worldMap" height="800" width="1000">
+            <defs>
+                <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+            </defs>
+        </svg>
+        <div class="infoContainer">
+            <p class="box">Gray areas represent countries that either did not win any Olympic medals or did not
+                participate in the Olympics.</p>
+            <svg id="legend" width="350" height="60" style="margin-left: 50px; margin-top: 20px;"></svg>
+        </div>
     </div>
-    </div>
-    
+
     <div id="charts">
         <svg id="medalChart" height="300" width="300"></svg>
         <svg id="gdpChart" height="300" width="300"></svg>
         <svg id="populationChart" height="300" width="300"></svg>
     </div>
     <p class="title">GDP and Medals comparison between different countries.</p>
-    <div class="lineCon">
-    <svg id="lineGraph" height="700" width="1000" style="margin-left: 50px;"></svg>
-    <svg id="lineLegend" width="200" height="80" style="margin-left: 100px; margin-top:100px;"></svg>
-    </div>
     <div id="button-bar"></div>
+    <div id="lineGraphContainer">
+        <svg id="lineGraph" width="1000" height="600"></svg>
+    </div>
+    <div class="hover-tooltip" id="hoverTooltip"></div>
     <script>
         const svgMap = d3.select("#worldMap");
         const widthMap = svgMap.attr("width");
@@ -244,20 +317,20 @@
                 .attr("class", "country")
                 .attr("d", path)
                 .on("mouseover", (event, d) => {
-                    
+
                     tooltip.transition().duration(200).style("opacity", .9);
                     tooltip.html(`${d.properties.name}`)
                         .style("left", (event.pageX + 10) + "px")
                         .style("top", (event.pageY - 28) + "px");
 
-                    
+
                     d3.select(event.target).classed("glow", true);
                 })
                 .on("mouseout", (event, d) => {
-                    // 隐藏工具提示
+
                     tooltip.transition().duration(500).style("opacity", 0);
 
-                    // 移除光晕效果
+
                     d3.select(event.target).classed("glow", false);
                 })
                 .on("click", (event, d) => {
@@ -443,177 +516,186 @@
         displayPopulationChart();
         mapData();
 
-
-        // Line Graph
         const olympic = async () => {
-        const olympicsData = await d3.csv("olympics.csv", d3.autoType);
-        // console.log(olympicsData);
+            const olympicsData = await d3.csv("olympics.csv", d3.autoType);
 
-        // Line Graph
-        const lineGraph = d3.select("#lineGraph");
-        const widthL = +lineGraph.attr("width");
-        const heightL = +lineGraph.attr("height");
-        const marginL = { top: 10, right: 50, bottom: 80, left: 50 };
-        const graphLWidth = widthL - marginL.left - marginL.right;
-        const graphLHeight = heightL - marginL.top - marginL.bottom;
+            const svg = d3.select("#lineGraph");
+            const tooltip = d3.select("#hoverTooltip");
 
-        let annotations = lineGraph.append("g").attr("id","annotations");
-        let chartArea = lineGraph.append("g").attr("id","points")
-                           .attr("transform",`translate(${marginL.left},${marginL.top})`);
+            const width = +svg.attr("width");
+            const height = +svg.attr("height");
+            const margin = { top: 20, right: 60, bottom: 80, left: 60 };
+            const graphWidth = width - margin.left - margin.right;
+            const graphHeight = height - margin.top - margin.bottom;
 
-        // Y axis - gdp
-        const gdpExtent = d3.extent(olympicsData, d => d['gdp']);
-        const gdpScale = d3.scaleLinear().domain(gdpExtent).range([graphLHeight, 0]);
-        let gdpAxis = d3.axisLeft(gdpScale)
-        let gdpGridlines = d3.axisLeft(gdpScale)
-                              .tickSize(-graphLWidth-25)
-                              .tickFormat("")
-        annotations.append("g")
-          .attr("class", "yGdpAxis")
-          .attr("transform",`translate(${marginL.left-6},${marginL.top})`)
-          .call(gdpAxis);
-        annotations.append("g")
-          .attr("class", "yGdpGridlines")
-          .attr("transform",`translate(${marginL.left-6},${marginL.top})`)
-          .call(gdpGridlines);
+            const chartArea = svg.append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
 
-        // Y axis - metal
-        const metalExtent = d3.extent(olympicsData, d => d['total']);
-        const metalScale = d3.scaleLinear().domain(metalExtent).range([graphLHeight, 0]);
-        let metalAxis = d3.axisRight(metalScale)
-        let metalGridlines = d3.axisRight(metalScale)
-                              .tickSize(-graphLWidth-25)
-                              .tickFormat("")
-        annotations.append("g")
-          .attr("class", "yMetAxis")
-          .attr("transform",`translate(${widthL-30},0)`)
-          .call(metalAxis);
-        annotations.append("g")
-          .attr("class", "yMetGridlines")
-          .attr("transform",`translate(${widthL-30},0)`)
-          .call(metalGridlines);
-      
-        // X axis - country
-        const country = d3.map(olympicsData, d => d.country) 
-        const countryScale = d3.scalePoint().domain(country).range([0, graphLWidth]).padding(0.05);
-        let bottomAxis = d3.axisBottom(countryScale);
-        let bottomAxisG = annotations.append("g")
-                                        .attr("class", "x axis")
-                                        .attr("transform",`translate(${marginL.left},${graphLHeight+marginL.top+10})`);
+            // Scales
+            const gdpScale = d3.scaleLinear().range([graphHeight, 0]); // GDP scale
+            const medalScale = d3.scaleLinear().range([graphHeight, 0]); // Medal scale
+            const gridlineScale = d3.scaleLinear().range([graphHeight, 0]); // Shared gridline scale
+            const countryScale = d3.scalePoint().range([0, graphWidth]).padding(0.5); // Country scale
 
-        var gclineGen = d3.line()
-                        .x( d => countryScale(d['country']) )
-                        .y( d => gdpScale(d['gdp']) )
-                        .curve(d3.curveMonotoneX);
+            // Axes
+            const gdpAxis = svg.append("g")
+                .attr("class", "yGdpAxis")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
 
-        var mclineGen = d3.line()
-                        .x( d => countryScale(d['country']) )
-                        .y( d => metalScale(d['total']) )
-                        .curve(d3.curveMonotoneX);
+            const medalAxis = svg.append("g")
+                .attr("class", "yMetAxis")
+                .attr("transform", `translate(${width - margin.right},${margin.top})`);
 
-        function updateLine(region) {
-            const filteredData = olympicsData.filter(d => d.region === region)
-                                            .sort((a, b) =>{ return b.gdp - a.gdp;});
+            const xAxis = svg.append("g")
+                .attr("transform", `translate(${margin.left},${height - margin.bottom})`);
 
-            countryScale.domain(filteredData.map(d => d.country));
-            if (region === "Asia" || region === "Europe") {
-                bottomAxisG.call(d3.axisBottom(countryScale))
-                                .selectAll("text")
-                                .style("text-anchor", "end")
-                                .style("font-size", "14")
-                                .attr("transform", "rotate(-30)");
-            }
-            else {
-            bottomAxisG.call(d3.axisBottom(countryScale))
-                                .selectAll("text")
-                                .style("text-anchor", "middle")
-                                .style("font-size", "14");
-            }
+            // Add gridlines
+            const gridlines = chartArea.append("g").attr("class", "gridline");
 
-            chartArea.selectAll("path").remove();
-            chartArea.selectAll("circle").remove();
-        
-            chartArea.append("path")
+            // Add focus line for mouse hover
+            const focusLine = chartArea.append("line")
+                .attr("class", "focus-line")
+                .attr("y1", 0)
+                .attr("y2", graphHeight)
+                .style("display", "none");
+
+            // Update chart with filtered data
+            function updateChart(filteredData) {
+                // Sort by GDP descending
+                filteredData.sort((a, b) => b.gdp - a.gdp);
+
+                // Update scales
+                gdpScale.domain(d3.extent(filteredData, d => d.gdp));
+                medalScale.domain(d3.extent(filteredData, d => d.total));
+
+                // Compute shared extent for gridlines alignment
+                const sharedExtent = [0, Math.max(...gdpScale.domain(), ...medalScale.domain())];
+                gridlineScale.domain(sharedExtent);
+
+                countryScale.domain(filteredData.map(d => d.country));
+
+                // Update axes
+                gdpAxis.call(d3.axisLeft(gdpScale));
+                medalAxis.call(d3.axisRight(medalScale));
+                xAxis.call(d3.axisBottom(countryScale))
+                    .selectAll("text")
+                    .attr("transform", "rotate(-45)")
+                    .style("text-anchor", "end");
+
+                // Update gridlines
+                gridlines.call(d3.axisLeft(gridlineScale)
+                    .tickSize(-graphWidth)
+                    .tickFormat(""));
+
+                // Remove existing elements
+                chartArea.selectAll(".line").remove();
+                chartArea.selectAll(".circle").remove();
+
+                // Draw GDP line
+                const gdpLine = d3.line()
+                    .x(d => countryScale(d.country))
+                    .y(d => gdpScale(d.gdp))
+                    .curve(d3.curveMonotoneX);
+
+                chartArea.append("path")
                     .datum(filteredData)
                     .attr("class", "line")
                     .attr("fill", "none")
                     .attr("stroke", "steelblue")
-                    .attr("stroke-width", 3)
-                    .attr("d", gclineGen);
+                    .attr("stroke-width", 2)
+                    .attr("d", gdpLine);
 
-            chartArea.selectAll("circle.gdp").data(filteredData)
-                    .join("circle")
-                    .attr("r", 3)
-                    .attr("fill", "navy")  
-                    .attr("cx", d => countryScale(d['country']) )
-                    .attr("cy", d => gdpScale(d['gdp']) );
-            
-            chartArea.append("path")
+                // Draw Medal line
+                const medalLine = d3.line()
+                    .x(d => countryScale(d.country))
+                    .y(d => medalScale(d.total))
+                    .curve(d3.curveMonotoneX);
+
+                chartArea.append("path")
                     .datum(filteredData)
                     .attr("class", "line")
                     .attr("fill", "none")
                     .attr("stroke", "coral")
-                    .attr("stroke-width", 3)
-                    .attr("d", mclineGen);
+                    .attr("stroke-width", 2)
+                    .attr("d", medalLine);
 
-            chartArea.selectAll("circle.met").data(filteredData)
+                // Add circles for GDP
+                chartArea.selectAll(".gdp-circle")
+                    .data(filteredData)
                     .join("circle")
-                    .attr("r", 3)
-                    .attr("fill", "coral")   
-                    .attr("cx", d => countryScale(d['country']) )
-                    .attr("cy", d => metalScale(d['total']) );
+                    .attr("class", "gdp-circle")
+                    .attr("r", 4)
+                    .attr("fill", "navy")
+                    .attr("cx", d => countryScale(d.country))
+                    .attr("cy", d => gdpScale(d.gdp));
 
-        }
+                // Add circles for Medals
+                chartArea.selectAll(".medal-circle")
+                    .data(filteredData)
+                    .join("circle")
+                    .attr("class", "medal-circle")
+                    .attr("r", 4)
+                    .attr("fill", "coral")
+                    .attr("cx", d => countryScale(d.country))
+                    .attr("cy", d => medalScale(d.total));
 
-        var countryDict = {}
-        olympicsData.forEach( d => {
-            countryDict[d.region] = d.region;
-        });
-        console.log(countryDict);
+                // Mouse interaction
+                chartArea.on("mousemove", function (event) {
+                    const [mouseX] = d3.pointer(event, this);
 
-        const allKeys = Object.keys(countryDict).sort();
+                    // Find closest data point
+                    const step = graphWidth / (filteredData.length - 1);
+                    const index = Math.round(mouseX / step);
+                    const selectedData = filteredData[index];
 
-        allKeys.forEach( d => {
-        // For each year key, add a new button to the button bar
-        d3.select("div#button-bar")
-          .append("button")
-          .text( d )         
-          .on("click", function() {
-            updateLine( d );
-          })
-        });      
-        
-        const lineLegendSvg = d3.select("#lineLegend")
-        lineLegendSvg.append("line")
-            .attr("x1", 20)
-            .attr("y1", 30)
-            .attr("x2", 80)
-            .attr("y2", 30)
-            .style("stroke", "navy")
-            .style("stroke-width", 4);
+                    if (selectedData) {
+                        const x = countryScale(selectedData.country);
 
-        lineLegendSvg.append("text")
-            .attr("x", 100)
-            .attr("y", 35)
-            .text("GDP")
-            .style("font-size", "20px");
-   
-        lineLegendSvg.append("line")
-            .attr("x1", 20)
-            .attr("y1", 60)
-            .attr("x2", 80)
-            .attr("y2", 60)
-            .style("stroke", "lightcoral")
-            .style("stroke-width", 4);
+                        focusLine
+                            .attr("x1", x)
+                            .attr("x2", x)
+                            .style("display", "block");
 
-        lineLegendSvg.append("text")
-            .attr("x", 100)
-            .attr("y", 65)
-            .text("Medals")
-            .style("font-size", "20px");
+                        tooltip
+                            .style("display", "block")
+                            .style("left", `${event.pageX + 10}px`)
+                            .style("top", `${event.pageY - 30}px`)
+                            .html(`
+                                <b>${selectedData.country}</b><br>
+                                GDP: ${selectedData.gdp}<br>
+                                Medals: ${selectedData.total}
+                            `);
+                    }
+                }).on("mouseleave", () => {
+                    focusLine.style("display", "none");
+                    tooltip.style("display", "none");
+                });
             }
 
-      olympic();
+            // Add buttons for filtering by region
+            const buttonBar = d3.select("#button-bar");
+            const continents = Array.from(new Set(olympicsData.map(d => d.region))).sort();
+
+            continents.forEach(region => {
+                buttonBar.append("button")
+                    .text(region)
+                    .on("click", () => {
+                        const filteredData = olympicsData.filter(d => d.region === region);
+                        updateChart(filteredData);
+                    });
+            });
+
+            // Initialize with Asia's data
+            const initialData = olympicsData.filter(d => d.region === "Asia");
+            updateChart(initialData);
+        };
+
+        olympic();
+
+
+
     </script>
+
 </body>
+
 </html>
