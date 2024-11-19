@@ -582,7 +582,7 @@
         displayGdpChart();
         displayPopulationChart();
         mapData();
-        
+
         //Line
 
 
@@ -629,7 +629,7 @@
                 .attr("y2", graphHeight)
                 .style("display", "none");
 
-
+            
             function updateChart(filteredData) {
 
                 filteredData.sort((a, b) => b.gdp - a.gdp);
@@ -745,7 +745,7 @@
 
                     if (selectedData) {
                         const x = countryScale(selectedData.country);
-
+                        //add line for mouse over
                         focusLine
                             .attr("x1", x)
                             .attr("x2", x)
