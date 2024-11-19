@@ -88,22 +88,6 @@
             cursor: pointer;
         }
 
-        .yGdpGridlines .domain {
-            display: none;
-        }
-
-        .yMetGridlines .domain {
-            display: none;
-        }
-
-        .yGdpGridlines line {
-            stroke: rgb(89, 89, 130);
-        }
-
-        .yMetGridlines line {
-            stroke: lightcoral;
-        }
-
         .yGdpAxis {
             color: navy;
         }
@@ -290,7 +274,7 @@
         }
 
         #lineGraphContainer {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
@@ -302,7 +286,6 @@
             border-radius: 10px;
             border: 1px solid #ddd;
         }
-
 
         @media (max-width: 768px) {
             .mapContainer {
@@ -358,10 +341,13 @@
     <p class="title">GDP and Medals comparison between different countries.</p>
     <div id="button-bar"></div>
     <div id="lineGraphContainer">
-        <svg id="lineGraph" width="1000" height="600"></svg>
+        <svg id="lineGraph" width="1200" height="600"></svg>
     </div>
     <div class="hover-tooltip" id="hoverTooltip"></div>
+
     <script>
+
+        // map
         const svgMap = d3.select("#worldMap");
         const widthMap = svgMap.attr("width");
         const heightMap = svgMap.attr("height");
@@ -596,8 +582,9 @@
         displayGdpChart();
         displayPopulationChart();
         mapData();
-
+        
         //Line
+
 
         const olympic = async () => {
             const olympicsData = await d3.csv("olympics.csv", d3.autoType);
@@ -607,7 +594,7 @@
 
             const width = +svg.attr("width");
             const height = +svg.attr("height");
-            const margin = { top: 20, right: 60, bottom: 80, left: 60 };
+            const margin = { top: 20, right: 200, bottom: 80, left: 60 };
             const graphWidth = width - margin.left - margin.right;
             const graphHeight = height - margin.top - margin.bottom;
 
@@ -722,7 +709,31 @@
                     .attr("fill", "coral")
                     .attr("cx", d => countryScale(d.country))
                     .attr("cy", d => medalScale(d.total));
+                    
+                const legend = svg.append("g")
+                                .attr("class", "lineLegend")
+                                .attr("transform", `translate(${width - margin.right + 60},${height / 2})`);
 
+                legend.append("rect")
+                    .attr("width", 10)
+                    .attr("height", 10)
+                    .attr("fill", "navy");
+
+                legend.append("text")
+                    .attr("x", 15)
+                    .attr("y", 10)
+                    .text("GDP per capita");
+
+                legend.append("rect")
+                    .attr("width", 10)
+                    .attr("height", 10)
+                    .attr("fill", "lightcoral")
+                    .attr("y", 20);
+
+                legend.append("text")
+                    .attr("x", 15)
+                    .attr("y", 30)
+                    .text("Total Medals");
 
                 chartArea.on("mousemove", function (event) {
                     const [mouseX] = d3.pointer(event, this);
