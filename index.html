@@ -373,7 +373,7 @@
         let maxGDP = 90000;
         let maxPopulation = 2000;
         let countries;
-
+        //Map
         const mapData = async function () {
             const world = await d3.json("countries_with_medals_no_antarctica.json");
 
@@ -421,6 +421,8 @@
 
             applyColorScheme('gdp');
 
+            //zoom and pan
+
             const zoom = d3.zoom()
                 .scaleExtent([1, 10])
                 .on("zoom", (event) => {
@@ -429,7 +431,7 @@
 
             svgMap.call(zoom);
 
-
+            //zoom in
             function zoomToCountry(countryData) {
                 const [[x0, y0], [x1, y1]] = path.bounds(countryData);
                 const scale = Math.max(1, Math.min(8, 0.9 / Math.max((x1 - x0) / widthMap, (y1 - y0) / heightMap)));
@@ -442,7 +444,7 @@
                     .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
             }
 
-
+            //reset
             window.resetZoom = function () {
                 svgMap.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
                 displayMedalChart({ gold: 0, silver: 0, bronze: 0, total: 0 });
@@ -522,7 +524,7 @@
                 .attr("transform", `translate(20,${20 + legendHeight})`)
                 .call(legendAxis);
         }
-
+        //three chart
         function createChart(svgSelector, data, maxValue, color) {
             const svg = d3.select(svgSelector);
             svg.selectAll("*").remove();
@@ -589,10 +591,13 @@
             createChart("#populationChart", populationData, maxPopulation, "orange");
         }
 
+        //call
         displayMedalChart();
         displayGdpChart();
         displayPopulationChart();
         mapData();
+
+        //Line
 
         const olympic = async () => {
             const olympicsData = await d3.csv("olympics.csv", d3.autoType);
@@ -751,7 +756,7 @@
                 });
             }
 
-
+            //filter using button
             const buttonBar = d3.select("#button-bar");
             const continents = Array.from(new Set(olympicsData.map(d => d.region))).sort();
 
@@ -769,6 +774,7 @@
             updateChart(initialData);
         };
 
+        //call
         olympic();
 
 
